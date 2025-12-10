@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tic Tac Toe Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #2b1055, #7597de);
+      color: white;
+    }
+
+    .container {
+      text-align: center;
+      background: rgba(0,0,0,0.4);
+      padding: 20px 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px black;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .mode {
+      margin-bottom: 10px;
+    }
+
+    select {
+      padding: 5px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: white;
+      color: #2b1055;
+      font-size: 40px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: transform 0.2s;
+    }
+
+    .cell:hover {
+      transform: scale(1.05);
+    }
+
+    button {
+      background: #ffcc00;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #ffdd33;
+    }
+
+    .status {
+      font-size: 20px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🎮 Tic Tac Toe</h1>
+
+  <div class="mode">
+    Mode:
+    <select id="mode">
+      <option value="pvp">Player vs Player</option>
+      <option value="ai">Player vs AI</option>
+    </select>
+  </div>
+
+  <div class="board" id="board">
+    <div class="cell" onclick="play(0)"></div>
+    <div class="cell" onclick="play(1)"></div>
+    <div class="cell" onclick="play(2)"></div>
+    <div class="cell" onclick="play(3)"></div>
+    <div class="cell" onclick="play(4)"></div>
+    <div class="cell" onclick="play(5)"></div>
+    <div class="cell" onclick="play(6)"></div>
+    <div class="cell" onclick="play(7)"></div>
+    <div class="cell" onclick="play(8)"></div>
+  </div>
+
+  <button onclick="resetGame()">Restart</button>
+  <div class="status" id="status">Player X's turn</div>
+</div>
+
+<script>
+  let board = ["", "", "", "", "", "", "", "", ""];
+  let currentPlayer = "X";
+  let gameOver = false;
+
+  const winPatterns = [
+    [0,1,2], [3,4,5], [6,7,8],
+    [0,3,6], [1,4,7], [2,5,8],
+    [0,4,8], [2,4,6]
+  ];
+
+  function play(index) {
+    if (board[index] !== "" || gameOver) return;
+
+    board[index] = currentPlayer;
+    document.getElementsByClassName("cell")[index].innerText = currentPlayer;
+
+    if (checkWin()) {
+      document.getElementById("status").innerText = `Player ${currentPlayer} Wins 🎉`;
+      gameOver = true;
+      return;
+    }
+
+    if (board.every(cell => cell !== "")) {
+      document.getElementById("status").innerText = "It's a Draw 🤝";
+      gameOver = true;
+      return;
+    }
+
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+    document.getElementById("status").innerText = `Player ${currentPlayer}'s turn`;
+
+    if (document.getElementById("mode").value === "ai" && currentPlayer === "O") {
+      setTimeout(aiMove, 500);
+    }
+  }
+
+  function aiMove() {
+    let emptyCells = board
+      .map((val, index) => val === "" ? index : null)
+      .filter(v => v !== null);
+
+    if (emptyCells.length === 0) return;
+
+    let randomMove = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    play(randomMove);
+  }
+
+  function checkWin() {
+    return winPatterns.some(pattern => {
+      return pattern.every(index => board[index] === currentPlayer);
+    });
+  }
+
+  function resetGame() {
+    board = ["", "", "", "", "", "", "", "", ""];
+    currentPlayer = "X";
+    gameOver = false;
+
+    let cells = document.getElementsByClassName("cell");
+    for (let cell of cells) {
+      cell.innerText = "";
+    }
+
+    document.getElementById("status").innerText = "Player X's turn";
+  }
+</script>
+
+</body>
+</html>
